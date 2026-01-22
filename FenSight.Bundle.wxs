@@ -1,0 +1,18 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle
+    Name="FenSight"
+    Manufacturer="FenSight"
+    Version="$(var.ProductVersion)"
+    UpgradeCode="{8C4A1C9A-1FD6-4A3C-8E6F-CB0C0E9A0E56}"
+    IconSourceFile="..\favicon.ico">
+
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication LicenseUrl="https://fensight.app/license" Theme="hyperlinkLicense" LogoFile="..\logo_fennok_mark.png" />
+    </BootstrapperApplication>
+
+    <Chain>
+      <MsiPackage SourceFile="$(var.MsiPath)" Vital="yes" />
+    </Chain>
+  </Bundle>
+</Wix>

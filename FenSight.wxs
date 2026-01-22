@@ -1,0 +1,44 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package
+    Name="FenSight"
+    Manufacturer="FenSight"
+    Version="$(var.ProductVersion)"
+    UpgradeCode="{F2D7D0A2-1B28-4B2F-9E0F-6C8A0D1B9B7C}"
+    Scope="perMachine"
+    Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of FenSight is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="FenSightIcon" SourceFile="..\favicon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="FenSightIcon" />
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="FenSight" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramMenuDir" Name="FenSight" />
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="FenSight" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="AppShortcuts" />
+    </Feature>
+
+    <Component Id="AppShortcuts" Directory="ProgramMenuDir" Guid="{39E2E78C-4D1C-4D52-A12F-9B503B8A8742}">
+      <Shortcut
+        Id="StartMenuShortcut"
+        Name="FenSight"
+        Target="[INSTALLFOLDER]FenSight.exe"
+        Icon="FenSightIcon"
+        WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="RemoveProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software\FenSight\FenSight" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <ui:WixUI Id="WixUI_Minimal" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+  </Package>
+</Wix>

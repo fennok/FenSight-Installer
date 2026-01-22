@@ -1,0 +1,24 @@
+<Project Sdk="WixToolset.Sdk/6.0.2">
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <OutputName>FenSightSetup</OutputName>
+    <TargetFramework>net6.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+
+    <!-- Passed in by build script -->
+    <InstallerVersion Condition="'$(InstallerVersion)' == ''">1.0.0</InstallerVersion>
+    <MsiPath Condition="'$(MsiPath)' == ''">$(MSBuildThisFileDirectory)..\artifacts\installer\FenSight.msi</MsiPath>
+
+    <DefineConstants>ProductVersion=$(InstallerVersion);MsiPath=$(MsiPath)</DefineConstants>
+
+    <OutputPath>$(MSBuildThisFileDirectory)..\artifacts\installer\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="FenSight.Bundle.wxs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" Version="6.0.2" />
+  </ItemGroup>
+</Project>
