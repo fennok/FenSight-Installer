@@ -34,6 +34,17 @@ Output artifacts land in:
 F:\Dev\FenSight-Installer\artifacts\installer\
 ```
 
+## One-command release (build + commit + push)
+This script builds the installer, commits artifacts, and pushes to GitHub.
+
+```powershell
+cd F:\Dev\FenSight-Installer
+.\release-installer.ps1 -InstallerVersion 1.2.3 -SourceRepoRoot F:\Dev\FenSight
+```
+
+If your working tree has local edits, add `-AllowDirty`.
+If you want to skip pushing, add `-NoPush`.
+
 ## Release workflow (plain-English)
 1) Make code changes in the private repo (`F:\Dev\FenSight`).
 2) Build the installer from this repo using `build-installer.ps1`.
