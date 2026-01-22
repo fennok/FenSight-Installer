@@ -3,22 +3,47 @@ param(
   [string]$Configuration = 'Release',
   [string]$Runtime = 'win-x64',
   [string]$InstallerVersion = '1.0.0',
+  [string]$SourceRepoRoot,
   [switch]$SkipBundle
 )
 
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$publishDir = Join-Path $repoRoot "artifacts\\publish\\$Runtime\\"
-$installerOutDir = Join-Path $repoRoot "artifacts\\installer\\"
+$installerRepoRoot = (Resolve-Path $PSScriptRoot).Path
+
+if (-not $SourceRepoRoot) {
+  if ($env:FENSIGHT_SOURCE_REPO) {
+    $SourceRepoRoot = $env:FENSIGHT_SOURCE_REPO
+  }
+}
+
+if (-not $SourceRepoRoot) {
+  $defaultSource = Join-Path $installerRepoRoot '..\\FenSight'
+  if (Test-Path $defaultSource) {
+    $SourceRepoRoot = (Resolve-Path $defaultSource).Path
+  }
+}
+
+if (-not $SourceRepoRoot) {
+  throw "Source repo not found. Pass -SourceRepoRoot or set FENSIGHT_SOURCE_REPO."
+}
+
+$SourceRepoRoot = (Resolve-Path $SourceRepoRoot).Path
+$sourceProject = Join-Path $SourceRepoRoot 'FenSight.csproj'
+if (-not (Test-Path $sourceProject)) {
+  throw "FenSight.csproj not found at $sourceProject"
+}
+
+$publishDir = Join-Path $installerRepoRoot "artifacts\\publish\\$Runtime\\"
+$installerOutDir = Join-Path $installerRepoRoot "artifacts\\installer\\"
 
 New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
 New-Item -ItemType Directory -Force -Path $installerOutDir | Out-Null
 
-Push-Location $repoRoot
+Push-Location $installerRepoRoot
 try {
   Write-Host "Publishing FenSight to $publishDir ..."
-  dotnet publish "$repoRoot\\FenSight.csproj" -c $Configuration -r $Runtime --self-contained true `
+  dotnet publish $sourceProject -c $Configuration -r $Runtime --self-contained true `
     /p:PublishDir="$publishDir" `
     /p:PublishSingleFile=false `
     /p:PublishReadyToRun=true `
@@ -26,7 +51,7 @@ try {
     /p:DebugSymbols=false
 
   Write-Host "Building MSI installer..."
-  dotnet build "$repoRoot\\Installer\\FenSight.Installer.wixproj" -c $Configuration `
+  dotnet build "$installerRepoRoot\\FenSight.Installer.wixproj" -c $Configuration `
     /p:PublishDir="$publishDir" `
     /p:InstallerVersion="$InstallerVersion"
 
@@ -39,7 +64,7 @@ try {
 
   if (-not $SkipBundle) {
     Write-Host "Building EXE bundle installer..."
-    dotnet build "$repoRoot\\Installer\\FenSight.Bundle.wixproj" -c $Configuration `
+    dotnet build "$installerRepoRoot\\FenSight.Bundle.wixproj" -c $Configuration `
       /p:MsiPath="$($msi.FullName)" `
       /p:InstallerVersion="$InstallerVersion"
 
