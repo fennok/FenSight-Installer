@@ -1,66 +1,27 @@
-# FenSight-Installer (Public)
+# FenSight Installer
 
-This repo holds only the installer project and the public release artifacts.
-The private source code stays in `F:\Dev\FenSight` and must never be copied here.
+This repo hosts the public Windows installer for FenSight.
 
-## Folder layout
-- `F:\Dev\FenSight` (private): full source, tests, internal docs.
-- `F:\Dev\FenSight-Installer` (public): installer scripts, WiX projects, release outputs.
+## Download
+Go to the Releases page and download the latest installer:
+https://github.com/fennok/FenSight-Installer/releases
 
-## One-time setup (if you are new to Git)
-1) Install Git for Windows.
-2) Install .NET SDK 9.x.
-3) Install WiX Toolset if builds fail (the `.wixproj` files require it).
-4) Make sure you can access GitHub (SSH key or HTTPS password/token).
+You will typically see:
+- `FenSight-<version>-win-x64-setup.exe` (recommended)
+- `FenSight-<version>-win-x64.msi`
+- `FenSight-<version>-win-x64-installer.zip` (contains both)
 
-## Build the installer (from the public repo)
-The build script publishes the app from the private repo, then builds the MSI/EXE.
+## Install (Windows 10/11)
+1) Download the `setup.exe` (recommended) or `.msi`.
+2) Run the installer and follow the prompts.
+3) Launch FenSight from the Start Menu.
 
-Example (explicit source path):
-```powershell
-cd F:\Dev\FenSight-Installer
-.\build-installer.ps1 -SourceRepoRoot F:\Dev\FenSight -InstallerVersion 1.2.3
-```
+## Verify download (optional)
+If you want to verify file integrity, compare the SHA256 hash in the release assets.
 
-Example (set an environment variable once):
-```powershell
-$env:FENSIGHT_SOURCE_REPO = 'F:\Dev\FenSight'
-cd F:\Dev\FenSight-Installer
-.\build-installer.ps1 -InstallerVersion 1.2.3
-```
+## Uninstall
+Open Windows Settings → Apps → Installed apps → FenSight → Uninstall.
 
-Output artifacts land in:
-```
-F:\Dev\FenSight-Installer\artifacts\installer\
-```
-
-## One-command release (build + commit + push)
-This script builds the installer, commits artifacts, and pushes to GitHub.
-
-```powershell
-cd F:\Dev\FenSight-Installer
-.\release-installer.ps1 -InstallerVersion 1.2.3 -SourceRepoRoot F:\Dev\FenSight
-```
-
-If your working tree has local edits, add `-AllowDirty`.
-If you want to skip pushing, add `-NoPush`.
-
-## Release workflow (plain-English)
-1) Make code changes in the private repo (`F:\Dev\FenSight`).
-2) Build the installer from this repo using `build-installer.ps1`.
-3) Verify the MSI/EXE in `artifacts\installer\`.
-4) Commit and push only the installer repo (public).
-5) Optionally create a GitHub Release and upload the MSI/EXE/ZIP.
-
-## Basic Git commands (short version)
-```powershell
-git status           # See what changed
-git add .            # Stage changes
-git commit -m "Message"  # Save changes locally
-git push             # Upload to GitHub
-```
-
-## Safety rules
-- Never copy `F:\Dev\FenSight` source files into this repo.
-- Do not commit secrets or local paths.
-- Keep only installer scripts and release artifacts here.
+## Notes
+- This repo is for distribution only.
+- Source code is not hosted here.
