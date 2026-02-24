@@ -11,7 +11,7 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of FenSight is already installed." />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
-    <Icon Id="FenSightIcon" SourceFile="..\favicon.ico" />
+    <Icon Id="FenSightIcon" SourceFile="$(var.SourceRepoRoot)\favicon.ico" />
     <Property Id="ARPPRODUCTICON" Value="FenSightIcon" />
 
     <StandardDirectory Id="ProgramFilesFolder">

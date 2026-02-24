@@ -3,7 +3,13 @@
 This repo hosts the public Windows installer for FenSight.
 
 ## Download
-Go to the Releases page and download the latest installer:
+Primary download host:
+https://downloads.fennok.com/fensight-installer/
+
+Current installer zip:
+https://downloads.fennok.com/fensight-installer/FenSight-1.0.0-win-x64-installer.zip
+
+GitHub Releases mirror:
 https://github.com/fennok/FenSight-Installer/releases
 
 You will typically see:
@@ -17,7 +23,11 @@ You will typically see:
 3) Launch FenSight from the Start Menu.
 
 ## Verify download (optional)
-If you want to verify file integrity, compare the SHA256 hash in the release assets.
+Each build now emits `.sha256` files alongside `.msi`, `.exe`, and `.zip`.
+
+Manual check example:
+
+`Get-FileHash "C:\path\to\FenSight-1.0.0-win-x64-installer.zip" -Algorithm SHA256`
 
 ## Uninstall
 Open Windows Settings → Apps → Installed apps → FenSight → Uninstall.

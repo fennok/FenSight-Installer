@@ -7,11 +7,12 @@
 
     <!-- Passed in by build script -->
     <InstallerVersion Condition="'$(InstallerVersion)' == ''">1.0.0</InstallerVersion>
-    <MsiPath Condition="'$(MsiPath)' == ''">$(MSBuildThisFileDirectory)..\artifacts\installer\FenSight.msi</MsiPath>
+    <MsiPath Condition="'$(MsiPath)' == ''">$(MSBuildThisFileDirectory)artifacts\installer\FenSight.msi</MsiPath>
+    <SourceRepoRoot Condition="'$(SourceRepoRoot)' == ''">$(MSBuildThisFileDirectory)..\FenSight</SourceRepoRoot>
 
-    <DefineConstants>ProductVersion=$(InstallerVersion);MsiPath=$(MsiPath)</DefineConstants>
+    <DefineConstants>ProductVersion=$(InstallerVersion);MsiPath=$(MsiPath);SourceRepoRoot=$(SourceRepoRoot)</DefineConstants>
 
-    <OutputPath>$(MSBuildThisFileDirectory)..\artifacts\installer\</OutputPath>
+    <OutputPath>$(MSBuildThisFileDirectory)artifacts\installer\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

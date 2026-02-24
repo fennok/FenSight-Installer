@@ -7,11 +7,12 @@
 
     <!-- Passed in by build script -->
     <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\artifacts\publish\win-x64\</PublishDir>
+    <SourceRepoRoot Condition="'$(SourceRepoRoot)' == ''">$(MSBuildThisFileDirectory)..\FenSight</SourceRepoRoot>
     <InstallerVersion Condition="'$(InstallerVersion)' == ''">1.0.0</InstallerVersion>
 
-    <DefineConstants>PublishDir=$(PublishDir);ProductVersion=$(InstallerVersion)</DefineConstants>
+    <DefineConstants>PublishDir=$(PublishDir);ProductVersion=$(InstallerVersion);SourceRepoRoot=$(SourceRepoRoot)</DefineConstants>
 
-    <OutputPath>$(MSBuildThisFileDirectory)..\artifacts\installer\</OutputPath>
+    <OutputPath>$(MSBuildThisFileDirectory)artifacts\installer\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
