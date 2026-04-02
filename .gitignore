@@ -4,3 +4,13 @@ obj/
 *.user
 *.suo
 artifacts/publish/
+.qodo/
+
+# Keep only distributable installer artifacts in source control.
+artifacts/installer/*
+!artifacts/installer/FenSight-*-*.msi
+!artifacts/installer/FenSight-*-*.msi.sha256
+!artifacts/installer/FenSight-*-*-setup.exe
+!artifacts/installer/FenSight-*-*-setup.exe.sha256
+!artifacts/installer/FenSight-*-*-installer.zip
+!artifacts/installer/FenSight-*-*-installer.zip.sha256

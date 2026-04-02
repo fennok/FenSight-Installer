@@ -8,7 +8,7 @@
     IconSourceFile="$(var.SourceRepoRoot)\favicon.ico">
 
     <BootstrapperApplication>
-      <bal:WixStandardBootstrapperApplication LicenseUrl="https://fensight.app/license" Theme="hyperlinkLicense" LogoFile="$(var.SourceRepoRoot)\logo_fennok_mark.png" />
+      <bal:WixInternalUIBootstrapperApplication />
     </BootstrapperApplication>
 
     <Chain>

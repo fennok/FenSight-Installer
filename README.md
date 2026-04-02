@@ -32,6 +32,19 @@ Manual check example:
 ## Uninstall
 Open Windows Settings → Apps → Installed apps → FenSight → Uninstall.
 
+## Maintainer notes
+- Installer branding is required. Keep these files in-repo:
+  - `Assets/FenSightBanner.bmp`
+  - `Assets/FenSightDialog.bmp`
+  - `FenSightLicense.rtf`
+- `FenSight.wxs` must keep:
+  - `WixVariable Id="WixUIBannerBmp" Value="Assets\FenSightBanner.bmp"`
+  - `WixVariable Id="WixUIDialogBmp" Value="Assets\FenSightDialog.bmp"`
+  - `WixVariable Id="WixUILicenseRtf" Value="FenSightLicense.rtf"`
+  - `WixUI_InstallDir` UI flow
+- `FenSight.Bundle.wxs` must keep `WixInternalUIBootstrapperApplication` (no external `LicenseUrl`).
+- `build-installer.ps1` validates these requirements and fails the build if they drift.
+
 ## Notes
 - This repo is for distribution only.
 - Source code is not hosted here.

@@ -2,7 +2,7 @@ param(
   [ValidateSet('Debug','Release')]
   [string]$Configuration = 'Release',
   [string]$Runtime = 'win-x64',
-  [string]$InstallerVersion = '1.0.0',
+  [string]$InstallerVersion = '1.1.0',
   [string]$SourceRepoRoot,
   [switch]$SkipBundle,
   [string]$PublicBaseUrl = 'https://downloads.fennok.com/fensight-installer'
@@ -35,6 +35,53 @@ function Write-Sha256Sidecar {
   }
 }
 
+function Assert-InstallerBranding {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$InstallerRepoRoot
+  )
+
+  $requiredFiles = @(
+    (Join-Path $InstallerRepoRoot 'FenSight.wxs'),
+    (Join-Path $InstallerRepoRoot 'FenSight.Bundle.wxs'),
+    (Join-Path $InstallerRepoRoot 'FenSightLicense.rtf'),
+    (Join-Path $InstallerRepoRoot 'Assets\FenSightBanner.bmp'),
+    (Join-Path $InstallerRepoRoot 'Assets\FenSightDialog.bmp')
+  )
+
+  foreach ($requiredFile in $requiredFiles) {
+    if (-not (Test-Path $requiredFile)) {
+      throw "Missing required installer branding file: $requiredFile"
+    }
+  }
+
+  $msiWxsPath = Join-Path $InstallerRepoRoot 'FenSight.wxs'
+  $msiWxs = Get-Content -Path $msiWxsPath -Raw
+  $requiredMsiPatterns = @(
+    'WixVariable\s+Id="WixUILicenseRtf"\s+Value="FenSightLicense\.rtf"',
+    'WixVariable\s+Id="WixUIBannerBmp"\s+Value="Assets\\FenSightBanner\.bmp"',
+    'WixVariable\s+Id="WixUIDialogBmp"\s+Value="Assets\\FenSightDialog\.bmp"',
+    '<ui:WixUI\s+Id="WixUI_InstallDir"\s*/>'
+  )
+
+  foreach ($pattern in $requiredMsiPatterns) {
+    if ($msiWxs -notmatch $pattern) {
+      throw "FenSight.wxs is missing required branded UI configuration pattern: $pattern"
+    }
+  }
+
+  $bundleWxsPath = Join-Path $InstallerRepoRoot 'FenSight.Bundle.wxs'
+  $bundleWxs = Get-Content -Path $bundleWxsPath -Raw
+  if ($bundleWxs -notmatch '<bal:WixInternalUIBootstrapperApplication\s*/>') {
+    throw "FenSight.Bundle.wxs must use WixInternalUIBootstrapperApplication for embedded MSI UI flow."
+  }
+  if ($bundleWxs -match 'LicenseUrl\s*=') {
+    throw "FenSight.Bundle.wxs contains LicenseUrl. External license links are not allowed."
+  }
+
+  Write-Host "Verified installer branding assets and UI configuration."
+}
+
 if (-not $SourceRepoRoot) {
   if ($env:FENSIGHT_SOURCE_REPO) {
     $SourceRepoRoot = $env:FENSIGHT_SOURCE_REPO
@@ -63,6 +110,8 @@ $installerOutDir = Join-Path $installerRepoRoot "artifacts\\installer\\"
 
 New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
 New-Item -ItemType Directory -Force -Path $installerOutDir | Out-Null
+
+Assert-InstallerBranding -InstallerRepoRoot $installerRepoRoot
 
 Push-Location $installerRepoRoot
 try {
