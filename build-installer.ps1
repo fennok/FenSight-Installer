@@ -2,8 +2,10 @@ param(
   [ValidateSet('Debug','Release')]
   [string]$Configuration = 'Release',
   [string]$Runtime = 'win-x64',
-  [string]$InstallerVersion = '1.1.0',
+  [string]$InstallerVersion = '1.4.0',
   [string]$SourceRepoRoot,
+  [string]$LocalAiAssetDir = $env:FENSIGHT_LOCAL_AI_ASSET_DIR,
+  [switch]$SkipLocalAiModels,
   [switch]$SkipBundle,
   [string]$PublicBaseUrl = 'https://downloads.fennok.com/fensight-installer'
 )
@@ -122,6 +124,28 @@ try {
     /p:PublishReadyToRun=true `
     /p:DebugType=None `
     /p:DebugSymbols=false
+
+  if (-not $SkipLocalAiModels) {
+    $stageLocalAiScript = Join-Path $SourceRepoRoot 'tools\Stage-LocalAiModels.ps1'
+    if (-not (Test-Path $stageLocalAiScript)) {
+      throw "Local AI staging script not found: $stageLocalAiScript"
+    }
+
+    Write-Host "Staging Local AI model assets to $publishDir ..."
+    $stageArgs = @(
+      '-NoProfile',
+      '-ExecutionPolicy', 'Bypass',
+      '-File', $stageLocalAiScript,
+      '-PublishDir', $publishDir
+    )
+    if (-not [string]::IsNullOrWhiteSpace($LocalAiAssetDir)) {
+      $stageArgs += @('-SourceDir', $LocalAiAssetDir)
+    }
+    & powershell @stageArgs
+    if ($LASTEXITCODE -ne 0) {
+      throw "Local AI model staging failed with exit code $LASTEXITCODE."
+    }
+  }
 
   Write-Host "Building MSI installer..."
   dotnet build "$installerRepoRoot\\FenSight.Installer.wixproj" -c $Configuration `
