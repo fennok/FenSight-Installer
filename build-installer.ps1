@@ -117,6 +117,10 @@ Assert-InstallerBranding -InstallerRepoRoot $installerRepoRoot
 
 Push-Location $installerRepoRoot
 try {
+  # Clean Release obj/ so that asset changes (favicon.ico, resources) are always re-embedded.
+  Write-Host "Cleaning previous Release output for $Runtime ..."
+  dotnet clean $sourceProject -c $Configuration -r $Runtime --verbosity quiet
+
   Write-Host "Publishing FenSight to $publishDir ..."
   dotnet publish $sourceProject -c $Configuration -r $Runtime --self-contained true `
     /p:PublishDir="$publishDir" `
