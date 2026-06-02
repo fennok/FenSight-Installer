@@ -10,6 +10,8 @@
     <BootstrapperApplication>
       <bal:WixStandardBootstrapperApplication
         Theme="rtfLicense"
+        ThemeFile="Assets\FenSightTheme.xml"
+        LocalizationFile="Assets\FenSightTheme.wxl"
         LicenseFile="FenSightLicense.rtf"
         LogoFile="Assets\FenSightLogo.png"
         SuppressOptionsUI="no" />
