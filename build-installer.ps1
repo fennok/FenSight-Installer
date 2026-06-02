@@ -48,7 +48,8 @@ function Assert-InstallerBranding {
     (Join-Path $InstallerRepoRoot 'FenSight.Bundle.wxs'),
     (Join-Path $InstallerRepoRoot 'FenSightLicense.rtf'),
     (Join-Path $InstallerRepoRoot 'Assets\FenSightBanner.bmp'),
-    (Join-Path $InstallerRepoRoot 'Assets\FenSightDialog.bmp')
+    (Join-Path $InstallerRepoRoot 'Assets\FenSightDialog.bmp'),
+    (Join-Path $InstallerRepoRoot 'Assets\FenSightLogo.png')
   )
 
   foreach ($requiredFile in $requiredFiles) {
@@ -74,8 +75,11 @@ function Assert-InstallerBranding {
 
   $bundleWxsPath = Join-Path $InstallerRepoRoot 'FenSight.Bundle.wxs'
   $bundleWxs = Get-Content -Path $bundleWxsPath -Raw
-  if ($bundleWxs -notmatch '<bal:WixInternalUIBootstrapperApplication\s*/>') {
-    throw "FenSight.Bundle.wxs must use WixInternalUIBootstrapperApplication for embedded MSI UI flow."
+  if ($bundleWxs -notmatch '<bal:WixStandardBootstrapperApplication') {
+    throw "FenSight.Bundle.wxs must use WixStandardBootstrapperApplication for the branded themed installer."
+  }
+  if ($bundleWxs -notmatch 'LicenseFile\s*=\s*"FenSightLicense\.rtf"') {
+    throw "FenSight.Bundle.wxs must embed FenSightLicense.rtf via LicenseFile for the themed bootstrapper."
   }
   if ($bundleWxs -match 'LicenseUrl\s*=') {
     throw "FenSight.Bundle.wxs contains LicenseUrl. External license links are not allowed."

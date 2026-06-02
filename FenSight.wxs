@@ -34,7 +34,7 @@
       <Shortcut
         Id="StartMenuShortcut"
         Name="FenSight"
-        Target="[INSTALLFOLDER]FenSight.exe"
+        Target="[INSTALLFOLDER]FenSightApp.exe"
         Icon="FenSightIcon"
         WorkingDirectory="INSTALLFOLDER" />
       <RemoveFolder Id="RemoveProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
