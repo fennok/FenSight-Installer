@@ -14,11 +14,17 @@
         LocalizationFile="Assets\FenSightTheme.wxl"
         LicenseFile="FenSightLicense.rtf"
         LogoFile="Assets\FenSightLogo.png"
+        LaunchTarget="[ProgramFilesFolder]FenSight\FenSightApp.exe"
         SuppressOptionsUI="no" />
     </BootstrapperApplication>
 
+    <!-- Drives the "Create a desktop shortcut" checkbox on the install screen (default on). -->
+    <Variable Name="CreateDesktopShortcut" Value="1" Type="numeric" bal:Overridable="yes" />
+
     <Chain>
-      <MsiPackage SourceFile="$(var.MsiPath)" Vital="yes" />
+      <MsiPackage SourceFile="$(var.MsiPath)" Vital="yes">
+        <MsiProperty Name="INSTALLDESKTOPSHORTCUT" Value="[CreateDesktopShortcut]" />
+      </MsiPackage>
     </Chain>
   </Bundle>
 </Wix>

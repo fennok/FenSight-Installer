@@ -13,6 +13,8 @@
 
     <Icon Id="FenSightIcon" SourceFile="$(var.SourceRepoRoot)\favicon.ico" />
     <Property Id="ARPPRODUCTICON" Value="FenSightIcon" />
+    <!-- Desktop shortcut opt-in (default on). The bundle passes this from its checkbox; a raw msiexec install honors it too (INSTALLDESKTOPSHORTCUT=0 to skip). -->
+    <Property Id="INSTALLDESKTOPSHORTCUT" Value="1" Secure="yes" />
     <WixVariable Id="WixUILicenseRtf" Value="FenSightLicense.rtf" />
     <WixVariable Id="WixUIBannerBmp" Value="Assets\FenSightBanner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="Assets\FenSightDialog.bmp" />
@@ -25,9 +27,13 @@
       <Directory Id="ProgramMenuDir" Name="FenSight" />
     </StandardDirectory>
 
+    <StandardDirectory Id="DesktopFolder" />
+
     <Feature Id="MainFeature" Title="FenSight" Level="1">
       <ComponentGroupRef Id="AppFiles" />
       <ComponentRef Id="AppShortcuts" />
+      <ComponentRef Id="DesktopShortcut" />
+      <ComponentRef Id="ShellExtensionRegistry" />
     </Feature>
 
     <Component Id="AppShortcuts" Directory="ProgramMenuDir" Guid="{39E2E78C-4D1C-4D52-A12F-9B503B8A8742}">
@@ -39,6 +45,60 @@
         WorkingDirectory="INSTALLFOLDER" />
       <RemoveFolder Id="RemoveProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
       <RegistryValue Root="HKCU" Key="Software\FenSight\FenSight" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="{456319C9-5343-40B2-BCC9-DDE23453A7C2}" Condition="INSTALLDESKTOPSHORTCUT = 1">
+      <Shortcut
+        Id="AppDesktopShortcut"
+        Name="FenSight"
+        Target="[INSTALLFOLDER]FenSightApp.exe"
+        Icon="FenSightIcon"
+        WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\FenSight\FenSight" Name="desktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="ShellExtensionRegistry" Directory="INSTALLFOLDER" Guid="{5C71D58E-461A-4A7D-A77E-69E579F16B8B}">
+      <RegistryValue Root="HKLM" Key="Software\Classes\.fns" Name="Content Type" Type="string" Value="application/x-fensight-board" KeyPath="yes" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\.fns" Name="PerceivedType" Type="string" Value="image" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\.fns\ShellEx\{e357fccd-a995-4576-b01f-234630154e96}" Type="string" Value="{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\.fns\ShellEx\{8895b1c6-b41f-4c1c-a562-0d564250836f}" Type="string" Value="{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" />
+
+      <RegistryValue Root="HKLM" Key="Software\Classes\FenSightShellExtension.FenSightThumbnailProvider" Type="string" Value="FenSightShellExtension.FenSightThumbnailProvider" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\FenSightShellExtension.FenSightThumbnailProvider\CLSID" Type="string" Value="{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\FenSightShellExtension.FenSightPreviewHandler" Type="string" Value="FenSightShellExtension.FenSightPreviewHandler" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\FenSightShellExtension.FenSightPreviewHandler\CLSID" Type="string" Value="{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" />
+
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" Type="string" Value="FenSightShellExtension.FenSightThumbnailProvider" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" Name="AppID" Type="string" Value="{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32" Type="string" Value="mscoree.dll" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32" Name="ThreadingModel" Type="string" Value="Both" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32" Name="Class" Type="string" Value="FenSightShellExtension.FenSightThumbnailProvider" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32" Name="Assembly" Type="string" Value="FenSightShellExtension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32" Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32" Name="CodeBase" Type="string" Value="file:///[INSTALLFOLDER]ShellExtension\FenSightShellExtension.dll" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32\1.0.0.0" Name="Class" Type="string" Value="FenSightShellExtension.FenSightThumbnailProvider" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32\1.0.0.0" Name="Assembly" Type="string" Value="FenSightShellExtension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32\1.0.0.0" Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\InprocServer32\1.0.0.0" Name="CodeBase" Type="string" Value="file:///[INSTALLFOLDER]ShellExtension\FenSightShellExtension.dll" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}\ProgId" Type="string" Value="FenSightShellExtension.FenSightThumbnailProvider" />
+
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" Type="string" Value="FenSightShellExtension.FenSightPreviewHandler" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" Name="AppID" Type="string" Value="{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32" Type="string" Value="mscoree.dll" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32" Name="ThreadingModel" Type="string" Value="Both" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32" Name="Class" Type="string" Value="FenSightShellExtension.FenSightPreviewHandler" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32" Name="Assembly" Type="string" Value="FenSightShellExtension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32" Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32" Name="CodeBase" Type="string" Value="file:///[INSTALLFOLDER]ShellExtension\FenSightShellExtension.dll" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32\1.0.0.0" Name="Class" Type="string" Value="FenSightShellExtension.FenSightPreviewHandler" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32\1.0.0.0" Name="Assembly" Type="string" Value="FenSightShellExtension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32\1.0.0.0" Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\InprocServer32\1.0.0.0" Name="CodeBase" Type="string" Value="file:///[INSTALLFOLDER]ShellExtension\FenSightShellExtension.dll" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}\ProgId" Type="string" Value="FenSightShellExtension.FenSightPreviewHandler" />
+
+      <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\PreviewHandlers" Name="{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" Type="string" Value="FenSight Board Preview Handler" />
+      <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" Type="string" Value="FenSight Thumbnail Handler" />
+      <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" Type="string" Value="FenSight Board Preview Handler" />
     </Component>
 
     <ui:WixUI Id="WixUI_InstallDir" />
