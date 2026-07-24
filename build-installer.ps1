@@ -2,9 +2,10 @@ param(
   [ValidateSet('Debug','Release')]
   [string]$Configuration = 'Release',
   [string]$Runtime = 'win-x64',
-  [string]$InstallerVersion = '1.8.1',
+  [string]$InstallerVersion = '1.9.0',
   [string]$SourceRepoRoot,
   [string]$LocalAiAssetDir = $env:FENSIGHT_LOCAL_AI_ASSET_DIR,
+  [switch]$SkipPublish,
   [switch]$SkipLocalAiModels,
   [switch]$SkipBundle,
   [string]$PublicBaseUrl = 'https://downloads.fennok.com/fensight-installer'
@@ -121,38 +122,44 @@ Assert-InstallerBranding -InstallerRepoRoot $installerRepoRoot
 
 Push-Location $installerRepoRoot
 try {
-  # Clean Release obj/ so that asset changes (favicon.ico, resources) are always re-embedded.
-  Write-Host "Cleaning previous Release output for $Runtime ..."
-  dotnet clean $sourceProject -c $Configuration -r $Runtime --verbosity quiet
+  if (-not $SkipPublish) {
+    # Clean Release obj/ so that asset changes (favicon.ico, resources) are always re-embedded.
+    Write-Host "Cleaning previous Release output for $Runtime ..."
+    dotnet clean $sourceProject -c $Configuration -r $Runtime --verbosity quiet
 
-  Write-Host "Publishing FenSight to $publishDir ..."
-  dotnet publish $sourceProject -c $Configuration -r $Runtime --self-contained true `
-    /p:PublishDir="$publishDir" `
-    /p:PublishSingleFile=false `
-    /p:PublishReadyToRun=true `
-    /p:DebugType=None `
-    /p:DebugSymbols=false
+    Write-Host "Publishing FenSight to $publishDir ..."
+    dotnet publish $sourceProject -c $Configuration -r $Runtime --self-contained true `
+      /p:PublishDir="$publishDir" `
+      /p:PublishSingleFile=false `
+      /p:PublishReadyToRun=true `
+      /p:DebugType=None `
+      /p:DebugSymbols=false
 
-  if (-not $SkipLocalAiModels) {
-    $stageLocalAiScript = Join-Path $SourceRepoRoot 'tools\Stage-LocalAiModels.ps1'
-    if (-not (Test-Path $stageLocalAiScript)) {
-      throw "Local AI staging script not found: $stageLocalAiScript"
-    }
+    if (-not $SkipLocalAiModels) {
+      $stageLocalAiScript = Join-Path $SourceRepoRoot 'tools\Stage-LocalAiModels.ps1'
+      if (-not (Test-Path $stageLocalAiScript)) {
+        throw "Local AI staging script not found: $stageLocalAiScript"
+      }
 
-    Write-Host "Staging Local AI model assets to $publishDir ..."
-    $stageArgs = @(
-      '-NoProfile',
-      '-ExecutionPolicy', 'Bypass',
-      '-File', $stageLocalAiScript,
-      '-PublishDir', $publishDir
-    )
-    if (-not [string]::IsNullOrWhiteSpace($LocalAiAssetDir)) {
-      $stageArgs += @('-SourceDir', $LocalAiAssetDir)
+      Write-Host "Staging Local AI model assets to $publishDir ..."
+      $stageArgs = @(
+        '-NoProfile',
+        '-ExecutionPolicy', 'Bypass',
+        '-File', $stageLocalAiScript,
+        '-PublishDir', $publishDir
+      )
+      if (-not [string]::IsNullOrWhiteSpace($LocalAiAssetDir)) {
+        $stageArgs += @('-SourceDir', $LocalAiAssetDir)
+      }
+      & powershell @stageArgs
+      if ($LASTEXITCODE -ne 0) {
+        throw "Local AI model staging failed with exit code $LASTEXITCODE."
+      }
     }
-    & powershell @stageArgs
-    if ($LASTEXITCODE -ne 0) {
-      throw "Local AI model staging failed with exit code $LASTEXITCODE."
-    }
+  } elseif (-not (Test-Path (Join-Path $publishDir 'FenSightApp.exe'))) {
+    throw "Signed publish output not found at $publishDir. Run once without -SkipPublish, sign that publish directory, then re-run with -SkipPublish."
+  } else {
+    Write-Host "Reusing existing publish output at $publishDir (expected to be signed)."
   }
 
   Write-Host "Building MSI installer..."

@@ -60,6 +60,7 @@
     <Component Id="ShellExtensionRegistry" Directory="INSTALLFOLDER" Guid="{5C71D58E-461A-4A7D-A77E-69E579F16B8B}">
       <RegistryValue Root="HKLM" Key="Software\Classes\.fns" Name="Content Type" Type="string" Value="application/x-fensight-board" KeyPath="yes" />
       <RegistryValue Root="HKLM" Key="Software\Classes\.fns" Name="PerceivedType" Type="string" Value="image" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\.fns\DefaultIcon" Type="string" Value="[INSTALLFOLDER]FenSightApp.exe,0" />
       <RegistryValue Root="HKLM" Key="Software\Classes\.fns\ShellEx\{e357fccd-a995-4576-b01f-234630154e96}" Type="string" Value="{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" />
       <RegistryValue Root="HKLM" Key="Software\Classes\.fns\ShellEx\{8895b1c6-b41f-4c1c-a562-0d564250836f}" Type="string" Value="{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" />
 
