@@ -20,10 +20,20 @@
 
     <!-- Drives the "Create a desktop shortcut" checkbox on the install screen (default on). -->
     <Variable Name="CreateDesktopShortcut" Value="1" Type="numeric" bal:Overridable="yes" />
+    <!-- Uninstall cleanup is always opt-in. Keeping all three at zero preserves upgrades,
+         repairs, and the default uninstall/reinstall experience. -->
+    <Variable Name="PurgeFenSightAppData" Value="0" Type="numeric" bal:Overridable="yes" />
+    <Variable Name="PurgeFenSightCache" Value="0" Type="numeric" bal:Overridable="yes" />
+    <Variable Name="PurgeFenSightTemp" Value="0" Type="numeric" bal:Overridable="yes" />
 
     <Chain>
-      <MsiPackage SourceFile="$(var.MsiPath)" Vital="yes">
+      <!-- Keep the embedded MSI out of Installed Apps when setup.exe owns the
+           install. The separately downloadable MSI remains usable and visible. -->
+      <MsiPackage SourceFile="$(var.MsiPath)" Vital="yes" Visible="no">
         <MsiProperty Name="INSTALLDESKTOPSHORTCUT" Value="[CreateDesktopShortcut]" />
+        <MsiProperty Name="PURGEFENSIGHTAPPDATA" Value="[PurgeFenSightAppData]" />
+        <MsiProperty Name="PURGEFENSIGHTCACHE" Value="[PurgeFenSightCache]" />
+        <MsiProperty Name="PURGEFENSIGHTTEMP" Value="[PurgeFenSightTemp]" />
       </MsiPackage>
     </Chain>
   </Bundle>

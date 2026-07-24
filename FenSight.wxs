@@ -15,6 +15,11 @@
     <Property Id="ARPPRODUCTICON" Value="FenSightIcon" />
     <!-- Desktop shortcut opt-in (default on). The bundle passes this from its checkbox; a raw msiexec install honors it too (INSTALLDESKTOPSHORTCUT=0 to skip). -->
     <Property Id="INSTALLDESKTOPSHORTCUT" Value="1" Secure="yes" />
+    <!-- Explicit uninstall cleanup choices. They remain off for direct MSI use,
+         upgrades, repairs, and unattended uninstall unless the caller opts in. -->
+    <Property Id="PURGEFENSIGHTAPPDATA" Value="0" Secure="yes" />
+    <Property Id="PURGEFENSIGHTCACHE" Value="0" Secure="yes" />
+    <Property Id="PURGEFENSIGHTTEMP" Value="0" Secure="yes" />
     <WixVariable Id="WixUILicenseRtf" Value="FenSightLicense.rtf" />
     <WixVariable Id="WixUIBannerBmp" Value="Assets\FenSightBanner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="Assets\FenSightDialog.bmp" />
@@ -101,6 +106,34 @@
       <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="{A7B1F2EC-AC96-47B8-9C63-0C892F6C7E39}" Type="string" Value="FenSight Thumbnail Handler" />
       <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved" Name="{D3E4CFBD-780F-4576-B3E2-81A464DB6DA2}" Type="string" Value="FenSight Board Preview Handler" />
     </Component>
+
+    <!-- Run the signed installed application in a cleanup-only mode before MSI
+         removes it. The user action handles the profile that launched setup;
+         the elevated machine action removes only shared FenSight license state. -->
+    <CustomAction
+      Id="CleanupFenSightMachineData"
+      Directory="INSTALLFOLDER"
+      ExeCommand="&quot;[INSTALLFOLDER]FenSightApp.exe&quot; --uninstall-cleanup-machine"
+      Execute="deferred"
+      Impersonate="no"
+      Return="check" />
+    <CustomAction
+      Id="CleanupFenSightUserData"
+      Directory="INSTALLFOLDER"
+      ExeCommand="&quot;[INSTALLFOLDER]FenSightApp.exe&quot; --uninstall-cleanup-user --purge-app-data [PURGEFENSIGHTAPPDATA] --purge-cache [PURGEFENSIGHTCACHE] --purge-temp [PURGEFENSIGHTTEMP]"
+      Execute="immediate"
+      Return="check" />
+
+    <InstallExecuteSequence>
+      <Custom
+        Action="CleanupFenSightUserData"
+        Before="CleanupFenSightMachineData"
+        Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE AND (PURGEFENSIGHTAPPDATA=1 OR PURGEFENSIGHTCACHE=1 OR PURGEFENSIGHTTEMP=1)" />
+      <Custom
+        Action="CleanupFenSightMachineData"
+        Before="RemoveFiles"
+        Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE AND PURGEFENSIGHTAPPDATA=1" />
+    </InstallExecuteSequence>
 
     <ui:WixUI Id="WixUI_InstallDir" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />

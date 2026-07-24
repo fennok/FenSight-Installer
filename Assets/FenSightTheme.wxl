@@ -27,7 +27,11 @@
   <String Id="OverallProgressPackageText" Value="Initializing..." />
   <String Id="ProgressCancelButton" Value="&amp;Cancel" />
   <String Id="ModifyHeader" Value="Modify Setup" />
-  <String Id="ModifyDataNote" Value="Uninstalling removes the FenSight program only. Your boards, settings, and caches are kept, so reinstalling stays fast (no re-generating thumbnails, AI tags, or previews).&#xA;&#xA;To reclaim that disk space, open FenSight first and use Settings &gt; Clear Thumbnail Cache and Clear Index before uninstalling." />
+  <String Id="ModifyDataNote" Value="Uninstall removes only the app by default. Optionally remove:" />
+  <String Id="PurgeAppDataCheckbox" Value="Settings, licenses, tutorial status, and diagnostics" />
+  <String Id="PurgeCacheCheckbox" Value="Generated cache, thumbnails, and AI/search index" />
+  <String Id="PurgeTempCheckbox" Value="Temporary FenSight working and diagnostic files" />
+  <String Id="ModifyDataSafetyNote" Value="Never removed: boards, source media, and FenSight Imports. Select all three for a fresh reinstall." />
   <String Id="ModifyRepairButton" Value="&amp;Repair" />
   <String Id="ModifyUninstallButton" Value="&amp;Uninstall" />
   <String Id="ModifyCancelButton" Value="&amp;Cancel" />
