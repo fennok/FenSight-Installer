@@ -2,7 +2,7 @@ param(
   [ValidateSet('Debug','Release')]
   [string]$Configuration = 'Release',
   [string]$Runtime = 'win-x64',
-  [string]$InstallerVersion = '1.10.0',
+  [string]$InstallerVersion = '1.11.0',
   [string]$SourceRepoRoot,
   [string]$LocalAiAssetDir = $env:FENSIGHT_LOCAL_AI_ASSET_DIR,
   [switch]$SkipPublish,
@@ -165,6 +165,17 @@ try {
     if ($LASTEXITCODE -ne 0) {
       throw "FenSight clean failed with exit code $LASTEXITCODE."
     }
+
+    # Clear the publish staging directory too. `dotnet clean` only touches the project's
+    # obj/bin, never this folder, and `dotnet publish` copies incrementally by timestamp --
+    # so a stale file here survives forever and gets harvested straight into the MSI. That is
+    # how a downgraded Magick.Native-Q8-x64.dll (7.1.2.29) kept reappearing in the package
+    # after the source repo had already been pinned back to the 10.3.0.0 build.
+    if (Test-Path $publishDir) {
+      Write-Host "Clearing publish staging directory $publishDir ..."
+      Remove-Item -LiteralPath $publishDir -Recurse -Force
+    }
+    New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
 
     Write-Host "Publishing FenSight to $publishDir ..."
     dotnet publish $sourceProject -c $Configuration -r $Runtime --self-contained true `

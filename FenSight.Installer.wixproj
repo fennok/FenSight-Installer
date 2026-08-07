@@ -5,6 +5,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
 
+    <!-- FenSight publishes win-x64 self-contained. Without this the MSI is a 32-bit package
+         and lands a 64-bit payload in "C:\Program Files (x86)\FenSight". Required for the
+         ProgramFiles64Folder reference in FenSight.wxs; the two must change together. -->
+    <InstallerPlatform>x64</InstallerPlatform>
+
     <!-- Passed in by build script -->
     <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)..\artifacts\publish\win-x64\</PublishDir>
     <SourceRepoRoot Condition="'$(SourceRepoRoot)' == ''">$(MSBuildThisFileDirectory)..\FenSight</SourceRepoRoot>
