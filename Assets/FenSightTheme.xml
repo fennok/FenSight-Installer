@@ -65,9 +65,10 @@
         <Page Name="Modify">
             <Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">#(loc.ModifyHeader)</Label>
             <Label X="11" Y="115" Width="-11" Height="24" FontId="3" DisablePrefix="yes">#(loc.ModifyDataNote)</Label>
-            <Checkbox Name="PurgeFenSightAppData" X="11" Y="151" Width="-11" Height="20" TabStop="yes" FontId="3">#(loc.PurgeAppDataCheckbox)</Checkbox>
-            <Checkbox Name="PurgeFenSightCache" X="11" Y="179" Width="-11" Height="20" TabStop="yes" FontId="3">#(loc.PurgeCacheCheckbox)</Checkbox>
-            <Checkbox Name="PurgeFenSightTemp" X="11" Y="207" Width="-11" Height="20" TabStop="yes" FontId="3">#(loc.PurgeTempCheckbox)</Checkbox>
+            <Checkbox Name="PurgeFenSightAll" X="11" Y="145" Width="-11" Height="17" TabStop="yes" FontId="3">#(loc.PurgeAllCheckbox)</Checkbox>
+            <Checkbox Name="PurgeFenSightAppData" X="27" Y="169" Width="-11" Height="20" TabStop="yes" FontId="3">#(loc.PurgeAppDataCheckbox)</Checkbox>
+            <Checkbox Name="PurgeFenSightCache" X="27" Y="190" Width="-11" Height="20" TabStop="yes" FontId="3">#(loc.PurgeCacheCheckbox)</Checkbox>
+            <Checkbox Name="PurgeFenSightTemp" X="27" Y="211" Width="-11" Height="20" TabStop="yes" FontId="3">#(loc.PurgeTempCheckbox)</Checkbox>
             <Label X="11" Y="241" Width="-11" Height="48" FontId="3" DisablePrefix="yes">#(loc.ModifyDataSafetyNote)</Label>
             <Button Name="ModifyUpdateButton" X="11" Y="-11" Width="200" Height="23" TabStop="yes" FontId="0" EnableCondition="WixStdBAUpdateAvailable" HideWhenDisabled="yes">#(loc.UpdateButton)</Button>
             <Button Name="RepairButton" X="-171" Y="-11" Width="75" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.ModifyRepairButton)</Button>

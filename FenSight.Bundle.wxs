@@ -14,7 +14,7 @@
         LocalizationFile="Assets\FenSightTheme.wxl"
         LicenseFile="FenSightLicense.rtf"
         LogoFile="Assets\FenSightLogo.png"
-        LaunchTarget="[ProgramFilesFolder]FenSight\FenSightApp.exe"
+        LaunchTarget="[ProgramFiles64Folder]FenSight\FenSightApp.exe"
         SuppressOptionsUI="no" />
     </BootstrapperApplication>
 
@@ -25,15 +25,21 @@
     <Variable Name="PurgeFenSightAppData" Value="0" Type="numeric" bal:Overridable="yes" />
     <Variable Name="PurgeFenSightCache" Value="0" Type="numeric" bal:Overridable="yes" />
     <Variable Name="PurgeFenSightTemp" Value="0" Type="numeric" bal:Overridable="yes" />
+    <!-- Convenience "select all" checkbox for the three purge options above. -->
+    <Variable Name="PurgeFenSightAll" Value="0" Type="numeric" bal:Overridable="yes" />
 
     <Chain>
       <!-- Keep the embedded MSI out of Installed Apps when setup.exe owns the
            install. The separately downloadable MSI remains usable and visible. -->
-      <MsiPackage SourceFile="$(var.MsiPath)" Vital="yes" Visible="no">
+      <!-- DisplayFilesInUseDialogCondition="1" makes Burn show its built-in Files In Use
+           prompt (close & retry / ignore / exit) when FenSight is still running and holding
+           files, instead of silently proceeding and failing partway through install/uninstall. -->
+      <MsiPackage SourceFile="$(var.MsiPath)" Vital="yes" Visible="no" bal:DisplayFilesInUseDialogCondition="1">
         <MsiProperty Name="INSTALLDESKTOPSHORTCUT" Value="[CreateDesktopShortcut]" />
         <MsiProperty Name="PURGEFENSIGHTAPPDATA" Value="[PurgeFenSightAppData]" />
         <MsiProperty Name="PURGEFENSIGHTCACHE" Value="[PurgeFenSightCache]" />
         <MsiProperty Name="PURGEFENSIGHTTEMP" Value="[PurgeFenSightTemp]" />
+        <MsiProperty Name="PURGEFENSIGHTALL" Value="[PurgeFenSightAll]" />
       </MsiPackage>
     </Chain>
   </Bundle>

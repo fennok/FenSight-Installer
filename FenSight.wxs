@@ -20,6 +20,10 @@
     <Property Id="PURGEFENSIGHTAPPDATA" Value="0" Secure="yes" />
     <Property Id="PURGEFENSIGHTCACHE" Value="0" Secure="yes" />
     <Property Id="PURGEFENSIGHTTEMP" Value="0" Secure="yes" />
+    <!-- Convenience "select all" flag from the bundle's parent checkbox. Forces the three
+         purge properties on below, rather than replacing them, so raw MSI/CLI use of the
+         individual properties keeps working unchanged. -->
+    <Property Id="PURGEFENSIGHTALL" Value="0" Secure="yes" />
     <WixVariable Id="WixUILicenseRtf" Value="FenSightLicense.rtf" />
     <WixVariable Id="WixUIBannerBmp" Value="Assets\FenSightBanner.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="Assets\FenSightDialog.bmp" />
@@ -140,6 +144,10 @@
       ExeCommand="&quot;[INSTALLFOLDER]FenSightApp.exe&quot; --uninstall-cleanup-user --purge-app-data [PURGEFENSIGHTAPPDATA] --purge-cache [PURGEFENSIGHTCACHE] --purge-temp [PURGEFENSIGHTTEMP]"
       Execute="immediate"
       Return="check" />
+
+    <SetProperty Id="ApplyPurgeAllAppData" Property="PURGEFENSIGHTAPPDATA" Value="1" Before="CleanupFenSightUserData" Sequence="execute">PURGEFENSIGHTALL=1</SetProperty>
+    <SetProperty Id="ApplyPurgeAllCache" Property="PURGEFENSIGHTCACHE" Value="1" Before="CleanupFenSightUserData" Sequence="execute">PURGEFENSIGHTALL=1</SetProperty>
+    <SetProperty Id="ApplyPurgeAllTemp" Property="PURGEFENSIGHTTEMP" Value="1" Before="CleanupFenSightUserData" Sequence="execute">PURGEFENSIGHTALL=1</SetProperty>
 
     <InstallExecuteSequence>
       <Custom
