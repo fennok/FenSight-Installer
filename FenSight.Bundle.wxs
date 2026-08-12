@@ -1,5 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Bundle
     Name="FenSight"
     Manufacturer="FenSight"
@@ -8,15 +9,30 @@
     IconSourceFile="$(var.SourceRepoRoot)\favicon.ico">
 
     <BootstrapperApplication>
+      <!-- LaunchTarget must track the INSTALLFOLDER StandardDirectory in FenSight.wxs.
+           Burn's ProgramFilesFolder is "Program Files (x86)"; the MSI installs under
+           ProgramFiles64Folder, so the x86 spelling makes the success-page Launch button
+           a silent no-op. build-installer.ps1 asserts the two stay in sync. -->
       <bal:WixStandardBootstrapperApplication
         Theme="rtfLicense"
         ThemeFile="Assets\FenSightTheme.xml"
         LocalizationFile="Assets\FenSightTheme.wxl"
         LicenseFile="FenSightLicense.rtf"
         LogoFile="Assets\FenSightLogo.png"
-        LaunchTarget="[ProgramFilesFolder]FenSight\FenSightApp.exe"
+        LaunchTarget="[ProgramFiles64Folder]FenSight\FenSightApp.exe"
         SuppressOptionsUI="no" />
     </BootstrapperApplication>
+
+    <!-- Feeds the "already installed" line on the install screen. Burn only tells the user
+         they are upgrading through the progress text, which is gone by the time they read it.
+         Must stay pinned to the MSI UpgradeCode in FenSight.wxs. With no FenSight installed the
+         search sets the variable to 0.0.0.0 (verified against a live bundle), so the theme's
+         "> v0.0.0.0" condition is false and the line stays hidden on a clean machine. -->
+    <util:ProductSearch
+      Id="FenSightInstalledVersionSearch"
+      Variable="FenSightInstalledVersion"
+      UpgradeCode="{F2D7D0A2-1B28-4B2F-9E0F-6C8A0D1B9B7C}"
+      Result="version" />
 
     <!-- Drives the "Create a desktop shortcut" checkbox on the install screen (default on). -->
     <Variable Name="CreateDesktopShortcut" Value="1" Type="numeric" bal:Overridable="yes" />

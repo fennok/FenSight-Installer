@@ -2,7 +2,7 @@ param(
   [ValidateSet('Debug','Release')]
   [string]$Configuration = 'Release',
   [string]$Runtime = 'win-x64',
-  [string]$InstallerVersion = '1.13.0',
+  [string]$InstallerVersion = '1.13.1',
   [string]$SourceRepoRoot,
   [string]$LocalAiAssetDir = $env:FENSIGHT_LOCAL_AI_ASSET_DIR,
   [switch]$SkipPublish,
@@ -94,6 +94,29 @@ function Assert-InstallerBranding {
     throw "FenSight.Bundle.wxs must hide its embedded MSI so Installed Apps exposes one FenSight uninstaller."
   }
 
+  # The success-page Launch button is a plain ShellExecute of LaunchTarget, and a missing
+  # path fails silently. Burn's ProgramFilesFolder resolves to "Program Files (x86)", so it
+  # drifts the moment the MSI moves under ProgramFiles64Folder -- which is exactly how 1.11.0
+  # through 1.13.0 shipped a Launch button that did nothing.
+  $msiInstallRoot = [regex]::Match(
+    $msiWxs,
+    '<StandardDirectory\s+Id="(?<root>ProgramFiles(?:64)?Folder)"\s*>\s*<Directory\s+Id="INSTALLFOLDER"\s+Name="(?<name>[^"]+)"')
+  if (-not $msiInstallRoot.Success) {
+    throw "FenSight.wxs must declare INSTALLFOLDER under a ProgramFiles StandardDirectory."
+  }
+  $bundleLaunch = [regex]::Match($bundleWxs, 'LaunchTarget\s*=\s*"\[(?<root>[^\]]+)\](?<rest>[^"]+)"')
+  if (-not $bundleLaunch.Success) {
+    throw "FenSight.Bundle.wxs must set LaunchTarget so the setup Launch button starts FenSight."
+  }
+  $expectedLaunchTail = "{0}\FenSightApp.exe" -f $msiInstallRoot.Groups['name'].Value
+  if ($bundleLaunch.Groups['root'].Value -ne $msiInstallRoot.Groups['root'].Value -or
+      $bundleLaunch.Groups['rest'].Value -ne $expectedLaunchTail) {
+    throw ("FenSight.Bundle.wxs LaunchTarget '[{0}]{1}' does not match the MSI install path '[{2}]{3}'. " +
+      "The Launch button would silently do nothing." -f
+      $bundleLaunch.Groups['root'].Value, $bundleLaunch.Groups['rest'].Value,
+      $msiInstallRoot.Groups['root'].Value, $expectedLaunchTail)
+  }
+
   foreach ($variableName in @('PurgeFenSightAppData', 'PurgeFenSightCache', 'PurgeFenSightTemp')) {
     if ($bundleWxs -notmatch ('Variable\s+Name="' + $variableName + '"\s+Value="0"')) {
       throw "FenSight.Bundle.wxs must define the opt-in cleanup variable $variableName with a zero default."
@@ -105,8 +128,30 @@ function Assert-InstallerBranding {
     }
   }
 
+  # "FenSight x.y.z is already installed" notice on the Install page. The UpgradeCode is the
+  # only link between the MSI and the bundle's ProductSearch; if they drift the notice silently
+  # never appears and upgrading users get no warning that settings are being carried over.
+  $msiUpgradeCode = [regex]::Match($msiWxs, 'UpgradeCode="(?<code>\{[0-9A-Fa-f-]+\})"')
+  $searchUpgradeCode = [regex]::Match($bundleWxs, '<util:ProductSearch[^>]*?UpgradeCode="(?<code>\{[0-9A-Fa-f-]+\})"')
+  if (-not $searchUpgradeCode.Success) {
+    throw "FenSight.Bundle.wxs must declare a util:ProductSearch so the install screen can report an existing FenSight."
+  }
+  if ($searchUpgradeCode.Groups['code'].Value -ne $msiUpgradeCode.Groups['code'].Value) {
+    throw ("FenSight.Bundle.wxs ProductSearch UpgradeCode {0} does not match the MSI UpgradeCode {1}." -f
+      $searchUpgradeCode.Groups['code'].Value, $msiUpgradeCode.Groups['code'].Value)
+  }
+
+  $wxlPath = Join-Path $InstallerRepoRoot 'Assets\FenSightTheme.wxl'
+  $wxl = Get-Content -Path $wxlPath -Raw
+  if ($wxl -notmatch 'Id="ExistingInstallNote"') {
+    throw "FenSightTheme.wxl is missing the ExistingInstallNote string."
+  }
+
   $themePath = Join-Path $InstallerRepoRoot 'Assets\FenSightTheme.xml'
   $theme = Get-Content -Path $themePath -Raw
+  if ($theme -notmatch 'Name="ExistingInstallNote"[^>]*VisibleCondition="FenSightInstalledVersion') {
+    throw "FenSightTheme.xml must show the ExistingInstallNote label only when FenSightInstalledVersion is set."
+  }
   foreach ($checkboxName in @('PurgeFenSightAppData', 'PurgeFenSightCache', 'PurgeFenSightTemp')) {
     if ($theme -notmatch ('Checkbox\s+Name="' + $checkboxName + '"')) {
       throw "FenSightTheme.xml is missing the uninstall cleanup checkbox $checkboxName."

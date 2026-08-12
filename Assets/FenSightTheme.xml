@@ -9,7 +9,10 @@
     <Font Id="2" Height="-22" Weight="500" Foreground="graytext">Segoe UI</Font>
     <Font Id="3" Height="-12" Weight="500" Foreground="windowtext" Background="window">Segoe UI</Font>
 
-    <Window Width="485" Height="340" HexStyle="100a0000" FontId="0" Caption="#(loc.Caption)">
+    <!-- Height grew from 340 to 374 to make room for the ExistingInstallNote band at the top of
+         the Install page without shrinking the EULA reading area. thmutil does not reflow, so
+         the band is always reserved and the label inside it is shown only on an upgrade. -->
+    <Window Width="485" Height="374" HexStyle="100a0000" FontId="0" Caption="#(loc.Caption)">
         <ImageControl X="0" Y="0" Width="485" Height="78" ImageFile="logo.png" Visible="yes"/>
 
         <Page Name="Help">
@@ -24,7 +27,9 @@
             <Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes" Visible="no" Name="CheckingForUpdatesLabel" />
         </Page>
         <Page Name="Install">
-            <Richedit Name="EulaRichedit" X="11" Y="80" Width="-11" Height="-90" TabStop="yes" FontId="0" HexStyle="800000" />
+            <Label Name="ExistingInstallNote" X="11" Y="80" Width="-11" Height="32" FontId="3" DisablePrefix="yes"
+                   VisibleCondition="FenSightInstalledVersion &gt; v0.0.0.0">#(loc.ExistingInstallNote)</Label>
+            <Richedit Name="EulaRichedit" X="11" Y="116" Width="-11" Height="-90" TabStop="yes" FontId="0" HexStyle="800000" />
             <Checkbox Name="CreateDesktopShortcut" X="11" Y="-65" Width="-11" Height="17" TabStop="yes" FontId="3">#(loc.DesktopShortcutCheckbox)</Checkbox>
             <Checkbox Name="EulaAcceptCheckbox" X="-11" Y="-41" Width="260" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallAcceptCheckbox)</Checkbox>
             <Button Name="InstallUpdateButton" X="11" Y="-11" Width="200" Height="23" TabStop="yes" FontId="0" EnableCondition="WixStdBAUpdateAvailable" HideWhenDisabled="yes">#(loc.UpdateButton)</Button>
