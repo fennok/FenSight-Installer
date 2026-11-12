@@ -2,7 +2,7 @@ param(
   [ValidateSet('Debug','Release')]
   [string]$Configuration = 'Release',
   [string]$Runtime = 'win-x64',
-  [string]$InstallerVersion = '1.13.1',
+  [string]$InstallerVersion = '1.14.0',
   [string]$SourceRepoRoot,
   [string]$LocalAiAssetDir = $env:FENSIGHT_LOCAL_AI_ASSET_DIR,
   [switch]$SkipPublish,

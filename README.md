@@ -7,7 +7,7 @@ Primary download host:
 https://downloads.fennok.com/fensight-installer/
 
 Current recommended setup:
-https://downloads.fennok.com/fensight-installer/FenSight-1.13.1-win-x64-setup.exe
+https://downloads.fennok.com/fensight-installer/FenSight-1.14.0-win-x64-setup.exe
 
 GitHub Releases mirror:
 https://github.com/fennok/FenSight-Installer/releases
@@ -34,7 +34,7 @@ Each build now emits `.sha256` files alongside `.msi`, `.exe`, and `.zip`.
 
 Manual check example:
 
-`Get-FileHash "C:\path\to\FenSight-1.13.1-win-x64-setup.exe" -Algorithm SHA256`
+`Get-FileHash "C:\path\to\FenSight-1.14.0-win-x64-setup.exe" -Algorithm SHA256`
 
 ## Uninstall
 Open Windows Settings → Apps → Installed apps → FenSight → Uninstall.
